@@ -1,0 +1,33 @@
+---
+import type { InferEntrySchema } from 'astro:content'
+import type { ShikiTransformer } from "shiki"
+import { createHighlighter } from "shiki"
+
+interface Props {
+    func: InferEntrySchema<"functions">
+}
+
+interface PartOptions {
+    str: string,
+    color?: string
+}
+
+const { func } = Astro.props
+
+const highlighter = await createHighlighter({ themes: ["github-dark"], langs: [] })
+const theme = highlighter.getTheme("github-dark")
+
+const variableColor = theme.tokenColors?.find(color => color.scope === "variable")?.settings.foreground
+
+const parts: PartOptions[] = []
+
+parts.push({ str: func.name, color: variableColor })
+console.log(variableColor)
+
+const raw_html = parts.map(part => {
+    return `<span ${part.color ? "color:" + part.color : ""} >${part.str}</span>`
+}).join("")
+
+---
+
+<pre class="astro-code" style="overflow-x: auto;" tabindex="0"><code><span class="line"><Fragment set:html={raw_html}/></span></code></pre>

@@ -1,0 +1,37 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Layout from "../../layouts/Layout.astro"
+import FunctionHeader from '../../components/FunctionHeader.astro';
+
+// 1. Generate a new path for every collection entry
+export async function getStaticPaths() {
+    const referenceEntries = await getCollection('reference');
+    
+    let paths = []
+
+    for (const entry of referenceEntries) {
+        let func
+        if (entry.data.func) {
+            func = await getEntry(entry.data.func.collection, entry.data.func.id)
+        }
+
+        paths.push({
+            params: { slug: entry.slug },
+            props: { entry, func }
+        })
+    }
+
+    return paths
+}
+
+// 2. For your template, you can get the entry directly from the prop
+const { entry, func } = Astro.props;
+const { Content } = await entry.render();
+
+---
+<Layout title={entry.data.title}>
+    <h1>{entry.data.title}</h1>
+    {func ? <FunctionHeader func={func.data} /> : ""}
+    <Content />
+    {func ? func.data.description : ""}
+</Layout>

@@ -1,0 +1,5 @@
+name: "first"
+description: "Example"
+arguments:
+  - name: "argument"
+    type: "string"
